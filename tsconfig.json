@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "lib": ["ES2015", "ESNext", "DOM"],
+    "jsx": "preserve",
+    "moduleResolution": "Node",
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "sourceMap": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "noEmit": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noImplicitAny": false, //不允许使用any
+    "noImplicitThis": true, //不允许往this上面挂属性
+    "experimentalDecorators": true /* Enables experimental support for ES7 decorators. */,
+    "rootDir": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src/*.d.ts", "src/**/*.d.ts", "src/**/*.ts", "src/**/*.tsx"]
+}
