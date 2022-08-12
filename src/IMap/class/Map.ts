@@ -44,7 +44,7 @@ export class Map extends Cesium.Viewer {
     scene.skyBox.show = false // 隐藏天空盒
     scene.skyAtmosphere.show = false // 隐藏信息圈
     scene.backgroundColor = new Cesium.Color(0.039, 0.301, 0.423, 1) // 天空盒颜色
-    scene.screenSpaceCameraController.minimumZoomDistance = 100
+    scene.screenSpaceCameraController.minimumZoomDistance = 1000
 
     this._listener = {
       click: {},
@@ -123,6 +123,11 @@ export class Map extends Cesium.Viewer {
     }
     this.camera.setView({
       destination: destination,
+      orientation: {
+      //  heading: Cesium.Math.toRadians(20.0),//方向
+      //  pitch: Cesium.Math.toRadians(-90.0),// 亲斜角度
+        roll: 0
+      }
     })
   }
 

@@ -47,8 +47,8 @@ export class Polygon {
             label: {
                 font: '14px 微软雅黑',
                 style: Cesium.LabelStyle.FILL,
-                fillColor: Cesium.Color.BLACK,     //填充颜色
-                outlineColor: Cesium.Color.BLACK,    //边框颜色
+                fillColor: Cesium.Color.WHITE,     //填充颜色
+                outlineColor: Cesium.Color.WHITE,    //边框颜色
                 ...entity.label,
             },
             polygon: {

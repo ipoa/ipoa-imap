@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="./lib/Cesium/Build/Cesium/Cesium.js"></script>
+  <link
+    href="./lib/Cesium/Build/Cesium/Widgets/widgets.css"
+    rel="stylesheef"
+  />
+  <link
+    rel="stylesheet"
+    href="./lib/Cesium/Apps/Sandcastle/templates/bucket.css"
+  />
+  <script src="pro4j.js"></script>
+  <script src="transport.js"></script>
+  <title>Demo-Cesium</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    #container {
+      width: 100%;
+      height: 100%;
+      left: 0;
+      top: 0;
+      display: block;
+      position: absolute;
+      border: none;
+    }
+  </style>
+</head>
+<body onload="initCesium()">
+<div id="container"></div>
+<script>
+  function initCesium() {
+    var container = document.getElementById("container");
+    let viewer = new Cesium.Viewer(container, {
+      infoBox: false,
+      fullscreenButton: false,
+      selectionIndicator: false,
+      navigation: false,
+      animation: false,
+      timeline: false,
+      baseLayerPicker: false,
+      geocoder: false,
+      homeButton: false,
+      sceneModePicker: false,
+      navigationHelpButton: false,
+      shouldAnimate: false,
+      // imageryProvider: null,
+    });
+
+    window.viewer = viewer; // this.viewer;
+    viewer._cesiumWidget._creditContainer.style.display = "none";
+    let scene = window.viewer.scene;
+    scene.fxaa = true;
+    scene.postProcessStages.fxaa.enabled = true;
+    scene.skyBox.show = false; //隐藏天空盒
+    scene.skyAtmosphere.show = false; //隐藏信息圈
+    scene.backgroundColor = new Cesium.Color(0.039, 0.301, 0.423, 1); //天空盒颜色
+    scene.screenSpaceCameraController.minimumZoomDistance = 100;
+
+    var provider = new Cesium.ArcGisMapServerImageryProvider({
+      url: 'http://10.75.36.14:6080/arcgis/rest/services/%E5%BA%95%E5%9B%BE/2022%E5%B9%B403%E6%9C%88%E5%BD%B1%E5%83%8F/MapServer',
+      layer: '底图_2022年03月影像',
+      maximumLevel: 22,
+    });
+
+
+    var imageryLayers = viewer.imageryLayers;
+    var layer1 = imageryLayers.addImageryProvider(provider);
+  }
+</script>
+</body>
+</html>
