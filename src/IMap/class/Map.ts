@@ -47,7 +47,10 @@ export class Map extends Cesium.Viewer {
     scene.screenSpaceCameraController.minimumZoomDistance = 1000
 
     this._listener = {
+      draw: {},
       click: {},
+      MOUSE_MOVE: {},
+      LEFT_CLICK: {},
     }
     // 通过转动的动画，三维球转到对应的视角和位置上
     this.setFitView(options)
@@ -89,10 +92,7 @@ export class Map extends Cesium.Viewer {
 
   event(type: ScreenSpaceEventMap, pickType, listener: (this: Window, ev: ScreenSpaceEventMap) => any) {
     // type 事件类类型，选中类型
-    switch (type) {
-      case 'click':
-        this._listener[type][pickType] = listener
-    }
+    this._listener[type][pickType] = listener
   }
 
   on(type: ScreenSpaceEventMap, listener: (this: Window, ev: any) => any) {

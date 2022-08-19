@@ -10,4 +10,4 @@ declare global {
     //  Cesium: Cesium;
   }
 }
-export declare type ScreenSpaceEventMap = 'click'
+export declare type ScreenSpaceEventMap = 'draw' | 'click' | 'MOUSE_MOVE' | 'LEFT_CLICK'

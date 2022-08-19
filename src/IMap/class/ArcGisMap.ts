@@ -1,4 +1,4 @@
-import Cesium from 'cesium'
+import * as Cesium from 'cesium'
 import { Map } from '@/IMap/class/Map'
 
 export declare namespace ArcGisMap {

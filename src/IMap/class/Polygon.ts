@@ -77,6 +77,9 @@ export class Polygon {
         switch (type) {
             case 'click':
                 this.map.event(type, 'polygon', listener.bind(this.billboards))
+            case 'draw':
+                this.map.event(type, 'draw', listener.bind(this.billboards))
+                break
         }
         //
     }
