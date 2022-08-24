@@ -8,8 +8,8 @@ export namespace Polygon {
     };
 
     export declare type AddOptions = Cesium.Entity.ConstructorOptions['polygon'] & {
-        hierarchy: any[]
-        material: string
+        material?: string
+        polygonPoint?: any
         alpha: number
         [key: string]: any
     }
@@ -39,9 +39,6 @@ export class Polygon {
     }
 
     add(entity: Polygon.AddOptions) {
-        if (entity.hierarchy.length <= 1) {
-            return false
-        }
         return this.billboards.add({
             position: entity.position,
             label: {
@@ -52,7 +49,7 @@ export class Polygon {
                 ...entity.label,
             },
             polygon: {
-                hierarchy: Cesium.Cartesian3.fromDegreesArray(entity.hierarchy),
+                hierarchy: entity.hierarchy ? Cesium.Cartesian3.fromDegreesArray(<any>entity.hierarchy) : entity.polygonPoint,
                 material: Cesium.Color.fromCssColorString(entity.material || '#ff0000').withAlpha(entity.alpha || 0.5),
             },
             added: { name: 'polygon', ...entity },

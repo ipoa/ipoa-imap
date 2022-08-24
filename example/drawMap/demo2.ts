@@ -13,4 +13,4 @@ const drawTool =new DrawPolygon({
   map
 })
 
-drawTool.drawPolygonBefore()
+drawTool.start()

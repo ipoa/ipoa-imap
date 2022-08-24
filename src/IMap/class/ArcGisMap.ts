@@ -20,7 +20,9 @@ export class ArcGisMap {
             //
         }
     }
-
+    removeAll(){
+        return this.map.imageryLayers.removeAll()
+    }
     addImageryProvider(options: ArcGisMap.AddImageryProviderOptions): Cesium.ImageryLayer {
         const imageryProvider = new Cesium.ArcGisMapServerImageryProvider(options)
         return this.map.imageryLayers.addImageryProvider(imageryProvider)

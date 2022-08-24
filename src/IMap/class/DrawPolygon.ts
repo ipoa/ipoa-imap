@@ -1,4 +1,3 @@
-import { ScreenSpaceEventMap } from '@/shims-ts'
 import { Map } from '@/IMap/class/Map'
 import * as Cesium from 'cesium'
 import {Polygon} from './Polygon'
@@ -15,7 +14,7 @@ export namespace DrawPolygon {
 export class DrawPolygon extends Polygon{
     drawTool?: any
     position?: any = []
-    polygonPoint: Array<Cesium.Cartesian3> = []
+    polygonPoint: Cesium.Cartesian3[] = []
     temporaryPolygonEntity: any
     polygonEntities?: any
 
@@ -38,7 +37,7 @@ export class DrawPolygon extends Polygon{
         })
     }
 
-    drawPolygonBefore() {
+    start() {
         // 清除可能会用到的监听事件
         let handler = this.map.handler3D
         if (handler) {
@@ -92,7 +91,7 @@ export class DrawPolygon extends Polygon{
             // 删除保存的临时多边形的entity
             this.temporaryPolygonEntity = null
             // 绘制结果多边形
-            this.position = this.drawPolygon()
+             this.addPolygon()
             // 清空多边形点数组，用于下次绘制
             this.polygonPoint = []
             // 清除所有事件
@@ -101,37 +100,52 @@ export class DrawPolygon extends Polygon{
                 handler.removeInputAction(Cesium.ScreenSpaceEventType.MOUSE_MOVE)
                 handler.removeInputAction(Cesium.ScreenSpaceEventType.RIGHT_CLICK)
             }
-            this.drawPolygonBefore()
+            this.start()
         }, Cesium.ScreenSpaceEventType.RIGHT_CLICK)
     }
-
-    drawPolygon() {
+    end(){
+        let handler = this.map.handler3D
+        if (handler) {
+            handler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK)
+            handler.removeInputAction(Cesium.ScreenSpaceEventType.MOUSE_MOVE)
+            handler.removeInputAction(Cesium.ScreenSpaceEventType.RIGHT_CLICK)
+        }
+    }
+    addPolygon() {
         // 删除最后一个动态添加的点，如果鼠标没移动，最后一个和倒数第二个是一样的，所以也要删除
         this.polygonPoint.pop()
         // 三个点以上才能绘制成多边形
         if (this.polygonPoint.length >= 3) {
-            this.polygonEntities = this.map.entities.add({
-                polygon: {
-                    hierarchy: <any>this.polygonPoint,
-                    extrudedHeight: 0,  // 多边体的高度（多边形拉伸高度）
-                    height: 10,  // 多边形离地高度
-                    material: Cesium.Color.BLUE.withAlpha(0.5),
-                    outlineColor: Cesium.Color.BLUE.withAlpha(0.5),
+          return  this.add({
+                polygonPoint: this.polygonPoint,
+                alpha: 0.5,
+                label:{
+                    text: '地块',
                     outlineWidth: 2,
-                },
+                }
             })
+            // this.polygonEntities = this.map.entities.add({
+            //     polygon: {
+            //         hierarchy: <any>this.polygonPoint,
+            //         extrudedHeight: 0,  // 多边体的高度（多边形拉伸高度）
+            //         height: 10,  // 多边形离地高度
+            //         material: Cesium.Color.BLUE.withAlpha(0.5),
+            //         outlineColor: Cesium.Color.BLUE.withAlpha(0.5),
+            //         outlineWidth: 2,
+            //     },
+            // })
             // 坐标转换--这里可以输出所有点位坐标，不需要就删除了
-            const pointArr: Array<any> = []
-            this.polygonPoint.forEach(val => {
-                let polyObj = { lon: 0, lat: 0 }
-                let cartographic = this.map.scene.globe.ellipsoid.cartesianToCartographic(val)
-                polyObj.lon = Cesium.Math.toDegrees(cartographic.longitude)
-                polyObj.lat = Cesium.Math.toDegrees(cartographic.latitude)
-                pointArr.push([polyObj.lon, polyObj.lat])
-            })
-            return pointArr
         }
-        return []
     }
-
+    getPolygonPoint(){
+        const pointArr: Array<any> = []
+        this.polygonPoint.forEach(val => {
+            let polyObj = { lon: 0, lat: 0 }
+            let cartographic = this.map.scene.globe.ellipsoid.cartesianToCartographic(val)
+            polyObj.lon = Cesium.Math.toDegrees(cartographic.longitude)
+            polyObj.lat = Cesium.Math.toDegrees(cartographic.latitude)
+            pointArr.push([polyObj.lon, polyObj.lat])
+        })
+        return pointArr
+    }
 }
