@@ -5,6 +5,7 @@ import { ScreenSpaceEventMap } from '@/shims-ts'
 export namespace LabelMarker {
     export declare type constructorOptions = {
         map: Map;
+        typeName?: string
     };
     export declare type AddOptions = {
         position: Cesium.Entity.ConstructorOptions['position']
@@ -17,25 +18,28 @@ export namespace LabelMarker {
 export class LabelMarker {
     map: Map
     billboards?: any
+    typeName: string
 
-    constructor(options: LabelMarker.constructorOptions) {
+    constructor (options: LabelMarker.constructorOptions) {
         this.map = options.map
+        this.typeName = options.typeName || 'labelMarker'
+
         if (this.map) {
             this.setBillboards()
         }
     }
 
-    setMap(map: Map) {
+    setMap (map: Map) {
         this.map = map
     }
 
-    setBillboards() {
+    setBillboards () {
         if (this.map) {
             this.billboards = this.map.entities
         }
     }
 
-    add(entity: LabelMarker.AddOptions) {
+    add (entity: LabelMarker.AddOptions) {
         return this.billboards.add({
             position: entity.position,
             billboard: entity.icon,
@@ -45,17 +49,17 @@ export class LabelMarker {
                 style: Cesium.LabelStyle.FILL,
                 fillColor: Cesium.Color.BLACK,     //填充颜色
                 outlineColor: Cesium.Color.BLACK,    //边框颜色
-                ...entity.label,
+                ...entity.label
             },
-            added: { name: 'labelMarker', ...entity },
+            added: { name: this.typeName, ...entity }
         })
 
     }
 
-    removeAll() {
+    removeAll () {
         const entities: any[] = []
         this.billboards.values.forEach(item => {
-            if (item.added.name === 'labelMarker') {
+            if (item.added.name === this.typeName) {
                 entities.push(item)
             }
         })
@@ -66,10 +70,10 @@ export class LabelMarker {
         }
     }
 
-    on(type: ScreenSpaceEventMap, listener: (this: Window, ev: any) => any) {
+    on (type: ScreenSpaceEventMap, listener: (this: Window, ev: any) => any) {
         switch (type) {
             case 'click':
-                this.map.event(type, 'labelMarker', listener.bind(this.billboards))
+                this.map.event(type, this.typeName, listener.bind(this.billboards))
         }
         //
     }
