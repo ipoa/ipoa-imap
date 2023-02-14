@@ -7,3 +7,5 @@ export * from './IMap/class/Polygon';
 export * from './IMap/class/ArcGisMap';
 export * from './IMap/class/DrawPolygon'
 export * from './IMap/class/Model'
+export * from './IMap/class/Measure'
+export * from './IMap/class/MouseTool'

@@ -1,6 +1,7 @@
 import { Map } from '@/IMap/class/Map'
 import * as Cesium from 'cesium'
 import {Polygon} from './Polygon'
+import { ScreenSpaceEventMap } from '@/shims-ts'
 export namespace DrawPolygon {
     export declare type constructorOptions = {
         map: Map;
@@ -15,11 +16,14 @@ export class DrawPolygon extends Polygon{
     drawTool?: any
     position?: any = []
     polygonPoint: Cesium.Cartesian3[] = []
+    tempPolygonPoint: Cesium.Cartesian3[] = []
     temporaryPolygonEntity: any
     polygonEntities?: any
+    listener: any
 
     constructor(opt: DrawPolygon.constructorOptions) {
         super(opt)
+        this.listener = {}
     }
 
     drawDynamicPolygon() {
@@ -28,7 +32,7 @@ export class DrawPolygon extends Polygon{
                 // 这个方法上面有重点说明
                 hierarchy: new Cesium.CallbackProperty(() => {
                     // PolygonHierarchy 定义多边形及其孔的线性环的层次结构（空间坐标数组）
-                    return new Cesium.PolygonHierarchy(this.polygonPoint)
+                    return new Cesium.PolygonHierarchy(this.tempPolygonPoint)
                 }, false),
                 extrudedHeight: 0,  // 多边体的高度（多边形拉伸高度）
                 height: 10,  // 多边形离地高度
@@ -54,7 +58,7 @@ export class DrawPolygon extends Polygon{
             // 判断是否定义（是否可以获取到空间坐标）
             if (Cesium.defined(cartesian)) {
                 // 将点添加进保存多边形点的数组中，鼠标停止移动的时添加的点和，点击时候添加的点，坐标一样
-                this.polygonPoint.push(cartesian)
+                this.tempPolygonPoint.push(cartesian)
                 // 判断是否开始绘制动态多边形，没有的话则开始绘制
                 if (this.temporaryPolygonEntity == null) {
                     // 绘制动态多边形
@@ -72,12 +76,12 @@ export class DrawPolygon extends Polygon{
                 // 判断是否已经开始绘制动态多边形，已经开始的话，则可以动态拾取鼠标移动的点，修改点的坐标
                 if (this.temporaryPolygonEntity) {
                     // 只要元素点大于一，每次就删除一个点，因为实时动态的点是添加上去的
-                    if (this.polygonPoint.length > 1) {
+                    if (this.tempPolygonPoint.length > 1) {
                         // 删除数组最后一个元素（鼠标移动添加进去的点）
-                        this.polygonPoint.pop()
+                        this.tempPolygonPoint.pop()
                     }
                     // 将新的点添加进动态多边形点的数组中，用于实时变化，注意：这里是先添加了一个点，然后再删除点，再添加，这样重复的
-                    this.polygonPoint.push(cartesian)
+                    this.tempPolygonPoint.push(cartesian)
                 }
             }
         }, Cesium.ScreenSpaceEventType.MOUSE_MOVE)
@@ -92,16 +96,35 @@ export class DrawPolygon extends Polygon{
             this.temporaryPolygonEntity = null
             // 绘制结果多边形
              this.addPolygon()
+            this.polygonPoint = this.tempPolygonPoint
             // 清空多边形点数组，用于下次绘制
-            this.polygonPoint = []
+            this.tempPolygonPoint = []
             // 清除所有事件
             if (handler) {
                 handler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK)
                 handler.removeInputAction(Cesium.ScreenSpaceEventType.MOUSE_MOVE)
                 handler.removeInputAction(Cesium.ScreenSpaceEventType.RIGHT_CLICK)
             }
-            this.start()
+            const closeList = this.listener.close
+            if (closeList){
+                for (const closeKey in closeList) {
+                    if (typeof closeList[closeKey] === 'function'){
+                        closeList[closeKey]()
+                    }
+                }
+            }
         }, Cesium.ScreenSpaceEventType.RIGHT_CLICK)
+    }
+    on (type: ScreenSpaceEventMap, listener: (this: Window, ev: any) => any) {
+        switch (type) {
+            case 'close':
+                 if(!this.listener[type]){
+                     this.listener[type] = []
+                 }
+                this.listener[type].push(listener)
+                break
+        }
+        //
     }
     end(){
         let handler = this.map.handler3D
@@ -113,11 +136,11 @@ export class DrawPolygon extends Polygon{
     }
     addPolygon() {
         // 删除最后一个动态添加的点，如果鼠标没移动，最后一个和倒数第二个是一样的，所以也要删除
-        this.polygonPoint.pop()
+        this.tempPolygonPoint.pop()
         // 三个点以上才能绘制成多边形
-        if (this.polygonPoint.length >= 3) {
+        if (this.tempPolygonPoint.length >= 3) {
           return  this.add({
-                polygonPoint: this.polygonPoint,
+                polygonPoint: this.tempPolygonPoint,
                 alpha: 0.5,
                 label:{
                     text: '地块',
@@ -126,7 +149,7 @@ export class DrawPolygon extends Polygon{
             })
             // this.polygonEntities = this.map.entities.add({
             //     polygon: {
-            //         hierarchy: <any>this.polygonPoint,
+            //         hierarchy: <any>this.tempPolygonPoint,
             //         extrudedHeight: 0,  // 多边体的高度（多边形拉伸高度）
             //         height: 10,  // 多边形离地高度
             //         material: Cesium.Color.BLUE.withAlpha(0.5),
