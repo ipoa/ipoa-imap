@@ -126,7 +126,8 @@ export class Measure {
                     positions.push(clickPosition);
                     // positions.push(positions[0]); // 闭合
                     this.addPoint(clickPosition);
-
+                    // this.map.entities.remove(labelEntity);
+                    // this.entityCollection.splice(this.entityCollection.indexOf(labelEntity), 1);
                     this.map.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
                     this.map.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.MOUSE_MOVE);
                     this.map.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.RIGHT_CLICK);
@@ -138,6 +139,8 @@ export class Measure {
 
                 }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 
+                labelEntity = this.addCenterPointLabel(positions[positions.length - 2], positions[positions.length - 1]);
+                this.entityCollection.push(labelEntity);
 
             } else if (positions.length >= 3) {
                 if (!cartesian) {
@@ -146,9 +149,10 @@ export class Measure {
                 positions.pop();
                 positions.push(cartesian.clone()); // 鼠标左击 添加第3个点
                 this.addPoint(cartesian);
+                labelEntity = this.addCenterPointLabel(positions[positions.length - 2], positions[positions.length - 1]);
+                this.entityCollection.push(labelEntity);
+
             }
-            labelEntity = this.addCenterPointLabel(positions[positions.length - 2], positions[positions.length - 1]);
-            this.entityCollection.push(labelEntity);
 
         }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
     }

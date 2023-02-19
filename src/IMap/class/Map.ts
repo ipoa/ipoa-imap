@@ -54,12 +54,26 @@ export class Map extends Cesium.Viewer {
     }
     // 通过转动的动画，三维球转到对应的视角和位置上
     this.setFitView(options)
-    // 点击事件
-    this.handler3D.setInputAction(this.screenSpaceClick.bind(this), Cesium.ScreenSpaceEventType.LEFT_CLICK)
+    this.watcher('click',true)
     window.viewer = this
 
   }
-
+  watcher(type: ScreenSpaceEventMap, enable:boolean){
+    if (enable){
+      switch (type) {
+        case 'click':
+          // 点击事件
+          this.handler3D.setInputAction(this.screenSpaceClick.bind(this), Cesium.ScreenSpaceEventType.LEFT_CLICK)
+              break
+      }
+    }else{
+      switch (type) {
+        case 'click':
+          this.handler3D.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK)
+          break
+      }
+    }
+  }
   screenSpaceClick(event) {
     this.screenSpaceEvent('click', event)
   }
@@ -85,9 +99,8 @@ export class Map extends Cesium.Viewer {
 
     if (Cesium.defined(pick) && pick.id && pick.id.added && pick.id.added.name) {
       typeof this._listener[type][pick.id.added.name] === 'function' && this._listener[type][pick.id.added.name]({ pick: pick.id, event, position: event.position, lnglat })
-    } else{
-      typeof this._listener[type]['map'] === 'function' && this._listener[type]['map']({ pick: undefined, event, position: event.position, lnglat })
     }
+    typeof this._listener[type]['map'] === 'function' && this._listener[type]['map']({ pick: (pick||{}).id, event, position: event.position, lnglat })
   }
 
   event(type: ScreenSpaceEventMap, pickType, listener: (this: Window, ev: ScreenSpaceEventMap) => any) {
