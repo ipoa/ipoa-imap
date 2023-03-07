@@ -53,8 +53,12 @@ export class Label {
     removeAll() {
         const entities: any[] = []
         this.billboards.values.forEach(item => {
-            if (item.added.name === 'label') {
-                entities.push(item)
+            try {
+                if (item.added.name === 'label') {
+                    entities.push(item)
+                }
+            }catch (e) {
+                console.warn(e)
             }
         })
         const length = entities.length

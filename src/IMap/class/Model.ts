@@ -64,9 +64,14 @@ export class Model {
     removeAll () {
         const entities: any[] = []
         this.billboards?.values.forEach((item: any) => {
-            if (item.added.name === 'model') {
-                entities.push(item)
+            try {
+                if (item.added.name === 'model') {
+                    entities.push(item)
+                }
+            }catch (e) {
+                console.warn(e)
             }
+
         })
         const length = entities.length
         this.map.entities.remove(entities[length - 1])

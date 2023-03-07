@@ -59,8 +59,12 @@ export class LabelMarker {
     removeAll () {
         const entities: any[] = []
         this.billboards.values.forEach(item => {
-            if (item.added.name === this.typeName) {
-                entities.push(item)
+            try {
+                if (item.added.name === this.typeName) {
+                    entities.push(item)
+                }
+            }catch (e) {
+                console.warn(e)
             }
         })
         const length = entities.length
