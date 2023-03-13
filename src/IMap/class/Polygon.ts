@@ -12,6 +12,7 @@ export namespace Polygon {
         material?: string
         polygonPoint?: any
         alpha: number
+        options: any
         zIndex?: number
         height?: number
         [key: string]: any
@@ -52,6 +53,7 @@ export class Polygon {
 
     add(entity: Polygon.AddOptions) {
         return this.billboards.add({
+            ...entity.options,
             position: entity.position,
             label: {
                 font: '14px 微软雅黑',
